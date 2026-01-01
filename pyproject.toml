@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paysgator"
+version = "0.1.0"
+authors = [
+  { name="Paysgator", email="dev@paysgator.com" },
+]
+description = "Official Python SDK for Paysgator API"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2.25.1",
+    "pydantic>=2.0.0"
+]
+
+[project.urls]
+"Homepage" = "https://paysgator.com"
+"Bug Tracker" = "https://github.com/paysgator/paysgator-python/issues"
