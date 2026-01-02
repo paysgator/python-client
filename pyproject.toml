@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "paysgator"
 version = "0.1.0"
 authors = [
-  { name="Paysgator", email="dev@paysgator.com" },
+  { name="Paysgator", email="info@paysgator.com" },
 ]
 description = "Official Python SDK for Paysgator API"
 readme = "README.md"
