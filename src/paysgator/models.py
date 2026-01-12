@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict, Any, Union
 from enum import Enum
 from pydantic import BaseModel, Field
 
@@ -6,32 +6,50 @@ class Mode(str, Enum):
     LIVE = "LIVE"
     TEST = "TEST"
 
+class PaymentCreateRequest(BaseModel):
+    amount: float
+    currency: str
+    external_transaction_id: Optional[str] = Field(None, alias="externalTransactionId")
+    payment_methods: Optional[List[str]] = Field(None, alias="payment_methods")
+    fields: Optional[List[str]] = None
+    return_url: Optional[str] = Field(None, alias="returnUrl")
+    metadata: Optional[Dict[str, Any]] = None
+
+class PaymentCreateResponseData(BaseModel):
+    paymentlink_id: str = Field(..., alias="paymentlinkId")
+    checkout_url: str = Field(..., alias="checkoutUrl")
+    transaction_id: str = Field(..., alias="transactionId")
+
+class PaymentCreateResponse(BaseModel):
+    success: bool
+    data: PaymentCreateResponseData
+
+class Customer(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    country: Optional[str] = None
+
+class PaymentConfirmRequest(BaseModel):
+    payment_link_id: str = Field(..., alias="paymentLinkId")
+    payment_method: str = Field(..., alias="paymentMethod")
+    payment_fields: Optional[Dict[str, Any]] = Field(None, alias="payment_fields")
+    customer: Optional[Customer] = None
+
+class PaymentConfirmResponseData(BaseModel):
+    transaction_id: str = Field(..., alias="transactionId")
+    fee: float
+    net_amount: float = Field(..., alias="netAmount")
+
+class PaymentConfirmResponse(BaseModel):
+    success: bool
+    data: PaymentConfirmResponseData
+
 class SubscriptionAction(str, Enum):
     CANCEL = "cancel"
     PAUSE = "pause"
     RESUME = "resume"
-
-class AuthResponse(BaseModel):
-    access_token: str = Field(..., alias="accessToken")
-    expires_in: int = Field(..., alias="expiresIn")
-    mode: Mode
-
-class PaymentLinkCreateRequest(BaseModel):
-    title: str
-    amount: float
-    currency: str
-    description: Optional[str] = None
-    return_url: Optional[str] = Field(None, alias="returnUrl")
-    fields: Optional[List[str]] = None
-    methods: Optional[List[str]] = None
-    confirm: Optional[bool] = None
-    payment_fields: Optional[dict] = None
-
-class PaymentLinkResponse(BaseModel):
-    id: str
-    url: str
-    status: str
-    mode: str
 
 class SubscriptionUpdateRequest(BaseModel):
     action: SubscriptionAction

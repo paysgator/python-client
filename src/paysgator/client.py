@@ -1,7 +1,8 @@
 import requests
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from .models import (
-    AuthResponse, PaymentLinkCreateRequest, PaymentLinkResponse,
+    PaymentCreateRequest, PaymentCreateResponse,
+    PaymentConfirmRequest, PaymentConfirmResponse,
     SubscriptionResponse, SubscriptionUpdateRequest, TransactionResponse,
     WalletBalanceResponse
 )
@@ -11,18 +12,26 @@ class Resource:
     def __init__(self, client):
         self.client = client
 
-class PaymentLinks(Resource):
-    def create(self, title: str, amount: float, currency: str, **kwargs) -> PaymentLinkResponse:
+class Payments(Resource):
+    def create(self, amount: float, currency: str, **kwargs) -> PaymentCreateResponse:
         data = {
-            "title": title,
             "amount": amount,
             "currency": currency,
             **kwargs
         }
-        # Validate with pydantic
-        request_model = PaymentLinkCreateRequest(**data)
-        response_data = self.client.request("POST", "/payment-links", data=request_model.model_dump(by_alias=True, exclude_none=True))
-        return PaymentLinkResponse(**response_data)
+        request_model = PaymentCreateRequest(**data)
+        response_data = self.client.request("POST", "/payment/create", data=request_model.model_dump(by_alias=True, exclude_none=True))
+        return PaymentCreateResponse(**response_data)
+
+    def confirm(self, payment_link_id: str, payment_method: str, **kwargs) -> PaymentConfirmResponse:
+        data = {
+            "paymentLinkId": payment_link_id,
+            "paymentMethod": payment_method,
+            **kwargs
+        }
+        request_model = PaymentConfirmRequest(**data)
+        response_data = self.client.request("POST", "/payment/confirm", data=request_model.model_dump(by_alias=True, exclude_none=True))
+        return PaymentConfirmResponse(**response_data)
 
 class Subscriptions(Resource):
     def update(self, subscription_id: str, action: str) -> SubscriptionResponse:
@@ -43,43 +52,26 @@ class Wallet(Resource):
 class PaysgatorClient:
     BASE_URL = "https://paysgator.com/api/v1"
 
-    def __init__(self, api_key: str, wallet_id: str):
+    def __init__(self, api_key: str):
         self.api_key = api_key
-        self.wallet_id = wallet_id
-        self._token = None
         self.session = requests.Session()
-        self.payment_links = PaymentLinks(self)
+        self.session.headers.update({
+            "X-Api-Key": self.api_key,
+            "Content-Type": "application/json"
+        })
+        
+        self.payments = Payments(self)
         self.subscriptions = Subscriptions(self)
         self.transactions = Transactions(self)
         self.wallet = Wallet(self)
 
-    def _authenticate(self):
-        url =f"{self.BASE_URL}/auth"
-        payload = {"apiKey": self.api_key, "walletId": self.wallet_id}
-        response = self.session.post(url, json=payload)
-        
-        if response.status_code == 200:
-            data = response.json()
-            auth_response = AuthResponse(**data)
-            self._token = auth_response.access_token
-            self.session.headers.update({"Authorization": f"Bearer {self._token}"})
-        elif response.status_code in [400, 401]:
-             raise AuthenticationError("Invalid API Key or Wallet ID")
-        else:
-            raise APIError(response.status_code, response.text)
+    def set_base_url(self, url: str):
+        self.BASE_URL = url
 
     def request(self, method: str, endpoint: str, data: Optional[dict] = None) -> dict:
-        if not self._token:
-            self._authenticate()
-        
         url = f"{self.BASE_URL}{endpoint}"
         response = self.session.request(method, url, json=data)
         
-        if response.status_code == 401:
-            # Token might have expired, retry once
-            self._authenticate()
-            response = self.session.request(method, url, json=data)
-
         if response.status_code >= 400:
              raise APIError(response.status_code, response.text)
         
