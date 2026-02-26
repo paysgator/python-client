@@ -2,9 +2,9 @@ from src.paysgator.client import PaysgatorClient
 
 #Mpesa direct charge test 
 
-api_key = "<Api Key>"
+# api_key = "<Api Key>"
 
-wallet_id = "<Wallet Id>"
+# wallet_id = "<Wallet Id>"
 
 client = PaysgatorClient(api_key, wallet_id)
 
