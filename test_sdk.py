@@ -1,10 +1,11 @@
+import os
 from src.paysgator.client import PaysgatorClient
 
 #Mpesa direct charge test 
 
-api_key = "<Api Key>"
+api_key = os.getenv("PAYSGATOR_API_KEY", "<Api Key>")
 
-wallet_id = "<Wallet Id>"
+wallet_id = os.getenv("PAYSGATOR_WALLET_ID", "<Wallet Id>")
 
 client = PaysgatorClient(api_key, wallet_id)
 

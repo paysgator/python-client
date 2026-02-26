@@ -73,5 +73,5 @@ class TransactionResponse(BaseModel):
 class WalletBalanceResponse(BaseModel):
     wallet_id: str = Field(..., alias="walletId")
     currency: str
-    balance: str
+    balance: float
     mode: str

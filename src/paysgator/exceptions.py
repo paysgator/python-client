@@ -8,7 +8,7 @@ class AuthenticationError(PaysgatorError):
 
 class APIError(PaysgatorError):
     """Raised when the API returns an error"""
-    def __init__(self, status_code: int, message: str):
+    def __init__(self, status_code: int, message: str, *args, **kwargs):
         self.status_code = status_code
         self.message = message
         super().__init__(f"API Error {status_code}: {message}")
