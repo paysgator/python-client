@@ -10,7 +10,7 @@ class PaymentCreateRequest(BaseModel):
     amount: float
     currency: str
     external_transaction_id: Optional[str] = Field(None, alias="externalTransactionId")
-    payment_methods: Optional[List[str]] = Field(None, alias="payment_methods")
+    payment_methods: Optional[List[str]] = Field(None, alias="paymentMethods")
     fields: Optional[List[str]] = None
     return_url: Optional[str] = Field(None, alias="returnUrl")
     metadata: Optional[Dict[str, Any]] = None
@@ -73,5 +73,5 @@ class TransactionResponse(BaseModel):
 class WalletBalanceResponse(BaseModel):
     wallet_id: str = Field(..., alias="walletId")
     currency: str
-    balance: str
+    balance: float
     mode: str
