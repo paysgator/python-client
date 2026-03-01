@@ -7,8 +7,8 @@ class Mode(str, Enum):
     TEST = "TEST"
 
 class PaymentCreateRequest(BaseModel):
-    amount: float
-    currency: str
+    amount: float = Field(..., gt=0)
+    currency: str = Field(..., min_length=3, max_length=3)
     external_transaction_id: Optional[str] = Field(None, alias="externalTransactionId")
     payment_methods: Optional[List[str]] = Field(None, alias="payment_methods")
     fields: Optional[List[str]] = None
@@ -62,8 +62,8 @@ class SubscriptionResponse(BaseModel):
 
 class TransactionResponse(BaseModel):
     id: str
-    amount: float
-    currency: str
+    amount: float = Field(..., gt=0)
+    currency: str = Field(..., min_length=3, max_length=3)
     status: str
     method: Optional[str] = None
     description: Optional[str] = None
@@ -72,6 +72,6 @@ class TransactionResponse(BaseModel):
 
 class WalletBalanceResponse(BaseModel):
     wallet_id: str = Field(..., alias="walletId")
-    currency: str
+    currency: str = Field(..., min_length=3, max_length=3)
     balance: str
     mode: str
