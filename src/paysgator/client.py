@@ -6,7 +6,7 @@ from .models import (
     SubscriptionResponse, SubscriptionUpdateRequest, TransactionResponse,
     WalletBalanceResponse
 )
-from .exceptions import AuthenticationError, APIError
+from .exceptions import APIError
 
 class Resource:
     def __init__(self, client):
@@ -66,7 +66,7 @@ class PaysgatorClient:
         self.wallet = Wallet(self)
 
     def set_base_url(self, url: str):
-        self.BASE_URL = url
+self.base_url = url
 
     def request(self, method: str, endpoint: str, data: Optional[dict] = None) -> dict:
         url = f"{self.BASE_URL}{endpoint}"
