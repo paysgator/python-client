@@ -11,9 +11,10 @@ pip install paysgator
 ## Usage
 
 ```python
+import os
 from paysgator import PaysgatorClient
 
-client = PaysgatorClient(api_key="YOUR_API_KEY")
+client = PaysgatorClient(api_key=os.getenv("PAYS_GATOR_API_KEY"))
 
 # Create a payment
 payment = client.payments.create(
