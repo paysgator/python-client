@@ -1,4 +1,5 @@
 from typing import List, Optional, Dict, Any, Union
+from decimal import Decimal
 from enum import Enum
 from pydantic import BaseModel, Field
 
@@ -7,10 +8,10 @@ class Mode(str, Enum):
     TEST = "TEST"
 
 class PaymentCreateRequest(BaseModel):
-    amount: float
+    amount: Decimal
     currency: str
     external_transaction_id: Optional[str] = Field(None, alias="externalTransactionId")
-    payment_methods: Optional[List[str]] = Field(None, alias="payment_methods")
+    payment_methods: Optional[List[str]] = Field(None, alias="paymentMethods")
     fields: Optional[List[str]] = None
     return_url: Optional[str] = Field(None, alias="returnUrl")
     metadata: Optional[Dict[str, Any]] = None
@@ -34,13 +35,13 @@ class Customer(BaseModel):
 class PaymentConfirmRequest(BaseModel):
     payment_link_id: str = Field(..., alias="paymentLinkId")
     payment_method: str = Field(..., alias="paymentMethod")
-    payment_fields: Optional[Dict[str, Any]] = Field(None, alias="payment_fields")
+    payment_fields: Optional[Dict[str, Any]] = Field(None, alias="paymentFields")
     customer: Optional[Customer] = None
 
 class PaymentConfirmResponseData(BaseModel):
     transaction_id: str = Field(..., alias="transactionId")
-    fee: float
-    net_amount: float = Field(..., alias="netAmount")
+    fee: Decimal
+    net_amount: Decimal = Field(..., alias="netAmount")
 
 class PaymentConfirmResponse(BaseModel):
     success: bool
@@ -62,7 +63,7 @@ class SubscriptionResponse(BaseModel):
 
 class TransactionResponse(BaseModel):
     id: str
-    amount: float
+    amount: Decimal
     currency: str
     status: str
     method: Optional[str] = None
@@ -73,5 +74,5 @@ class TransactionResponse(BaseModel):
 class WalletBalanceResponse(BaseModel):
     wallet_id: str = Field(..., alias="walletId")
     currency: str
-    balance: str
+    balance: Decimal
     mode: str

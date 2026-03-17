@@ -1,22 +1,18 @@
-from src.paysgator.client import PaysgatorClient
+from paysgator import PaysgatorClient
 
 #Mpesa direct charge test 
 
-api_key = "<Api Key>"
+import os
 
-wallet_id = "<Wallet Id>"
+api_key = os.environ.get("PAYSGATOR_API_KEY", "<Api Key>")
 
-client = PaysgatorClient(api_key, wallet_id)
+client = PaysgatorClient(api_key=api_key)
 
-link = client.payment_links.create(
-    title="Test Product",
+link = client.payments.create(
     amount=50.0,
     currency="MZN",
-    methods=["MPESA"],
-    payment_fields={
-        "phoneNumber":""
-    },
-    confirm=True,
+    payment_methods=["MPESA"],
+    return_url="https://example.com/callback"
 )
 
 print(link)
