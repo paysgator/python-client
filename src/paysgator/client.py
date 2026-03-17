@@ -70,7 +70,7 @@ class PaysgatorClient:
 
     def request(self, method: str, endpoint: str, data: Optional[dict] = None) -> dict:
         url = f"{self.BASE_URL}{endpoint}"
-        response = self.session.request(method, url, json=data)
+        response = self.session.request(method, url, json=data, timeout=30)
         
         if response.status_code >= 400:
              raise APIError(response.status_code, response.text)
