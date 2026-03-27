@@ -7,10 +7,10 @@ class Mode(str, Enum):
     TEST = "TEST"
 
 class PaymentCreateRequest(BaseModel):
-    amount: float
+    amount: float = Field(..., gt=0)
     currency: str
     external_transaction_id: Optional[str] = Field(None, alias="externalTransactionId")
-    payment_methods: Optional[List[str]] = Field(None, alias="payment_methods")
+    payment_methods: Optional[List[str]] = Field(None)
     fields: Optional[List[str]] = None
     return_url: Optional[str] = Field(None, alias="returnUrl")
     metadata: Optional[Dict[str, Any]] = None
@@ -34,7 +34,7 @@ class Customer(BaseModel):
 class PaymentConfirmRequest(BaseModel):
     payment_link_id: str = Field(..., alias="paymentLinkId")
     payment_method: str = Field(..., alias="paymentMethod")
-    payment_fields: Optional[Dict[str, Any]] = Field(None, alias="payment_fields")
+    payment_fields: Optional[Dict[str, Any]] = Field(None)
     customer: Optional[Customer] = None
 
 class PaymentConfirmResponseData(BaseModel):
