@@ -29,6 +29,4 @@ env.bak/
 venv.bak/
 include
 bin/
-lib/
-lib64/
 usr/
