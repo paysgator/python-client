@@ -53,6 +53,8 @@ class PaysgatorClient:
     BASE_URL = "https://paysgator.com/api/v1"
 
     def __init__(self, api_key: str):
+        if not api_key or not isinstance(api_key, str) or len(api_key.strip()) < 10:
+            raise ValueError("API key must be a non-empty string with at least 10 characters")
         self.api_key = api_key
         self.session = requests.Session()
         self.session.headers.update({
@@ -70,7 +72,7 @@ class PaysgatorClient:
 
     def request(self, method: str, endpoint: str, data: Optional[dict] = None) -> dict:
         url = f"{self.BASE_URL}{endpoint}"
-        response = self.session.request(method, url, json=data)
+        response = self.session.request(method, url, json=data, timeout=30)
         
         if response.status_code >= 400:
              raise APIError(response.status_code, response.text)
