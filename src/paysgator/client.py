@@ -50,10 +50,11 @@ class Wallet(Resource):
         return WalletBalanceResponse(**response_data)
 
 class PaysgatorClient:
-    BASE_URL = "https://paysgator.com/api/v1"
+    DEFAULT_BASE_URL = "https://paysgator.com/api/v1"
 
     def __init__(self, api_key: str):
         self.api_key = api_key
+        self._base_url = self.DEFAULT_BASE_URL
         self.session = requests.Session()
         self.session.headers.update({
             "X-Api-Key": self.api_key,
@@ -66,13 +67,15 @@ class PaysgatorClient:
         self.wallet = Wallet(self)
 
     def set_base_url(self, url: str):
-        self.BASE_URL = url
+        self._base_url = url
 
     def request(self, method: str, endpoint: str, data: Optional[dict] = None) -> dict:
-        url = f"{self.BASE_URL}{endpoint}"
+        url = f"{self._base_url}{endpoint}"
         response = self.session.request(method, url, json=data)
         
-        if response.status_code >= 400:
-             raise APIError(response.status_code, response.text)
+        if response.status_code == 401 or response.status_code == 403:
+            raise AuthenticationError(response.status_code, response.text)
+        elif response.status_code >= 400:
+            raise APIError(response.status_code, response.text)
         
         return response.json()
