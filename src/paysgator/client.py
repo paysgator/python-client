@@ -36,7 +36,7 @@ class Payments(Resource):
 class Subscriptions(Resource):
     def update(self, subscription_id: str, action: str) -> SubscriptionResponse:
         request_model = SubscriptionUpdateRequest(action=action)
-        response_data = self.client.request("PATCH", f"/subscriptions/{subscription_id}", data=request_model.model_dump(by_alias=True))
+        response_data = self.client.request("PATCH", f"/subscriptions/{subscription_id}", data=request_model.model_dump(by_alias=True, exclude_none=True))
         return SubscriptionResponse(**response_data)
 
 class Transactions(Resource):
@@ -66,13 +66,17 @@ class PaysgatorClient:
         self.wallet = Wallet(self)
 
     def set_base_url(self, url: str):
-        self.BASE_URL = url
+        self._base_url = url
 
-    def request(self, method: str, endpoint: str, data: Optional[dict] = None) -> dict:
-        url = f"{self.BASE_URL}{endpoint}"
+    def request(self, method: str, endpoint: str, data: Optional[dict] = None) -> Dict[str, Any]:
+        url = f"{self._base_url}{endpoint}"
         response = self.session.request(method, url, json=data)
         
         if response.status_code >= 400:
-             raise APIError(response.status_code, response.text)
+            try:
+                error_data = response.json()
+                raise APIError(response.status_code, error_data)
+            except ValueError:
+                raise APIError(response.status_code, response.text)
         
         return response.json()
